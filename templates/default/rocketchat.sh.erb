@@ -1,0 +1,47 @@
+#!/bin/sh
+# chkconfig:   - 85 15
+# description:  rocketchat
+
+export MONGO_URL=mongodb://127.0.0.1:27017/rocketchat
+export ROOT_URL=http://<%= @rocketchat_ip %>
+export PORT=3000
+
+SERVICE=rocketchat
+
+start() {
+    cd /opt/Rocket.Chat
+    sudo -u rocketchat -E node main.js &
+    echo "service $SERVICE [start]"
+}
+stop() {
+    pkill node
+    echo "service $SERVICE [stop]"
+}
+status() {
+   PID=`pgrep node | wc -l`
+   if [ $PID -eq 0 ]; then
+       echo "$SERVICE stop"
+   else
+       echo "running $SERVICE ..."
+   fi
+}
+
+case $1 in
+start)
+       start
+       ;;
+stop)
+       stop
+       ;;
+status)
+       status
+       ;;
+restart)
+       stop
+       start
+       ;;
+*)
+       echo "Usage: $SERVICE [start|stop|restart|status]"
+       ;;
+esac
+exit 0
